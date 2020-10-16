@@ -68,9 +68,22 @@ public class User {
 	public void clearVisitedLocations() {
 		visitedLocations.clear();
 	}
-	
+
+	public synchronized boolean hasRewardForAttraction(String attractionName){
+		boolean hasReward = false;
+
+		for(int i=0; i<this.getUserRewards().size();i++){
+			UserReward reward = this.getUserRewards().get(i);
+			if(reward.attraction.attractionName.equals(attractionName)){
+				return true;
+			}
+		}
+
+		return hasReward;
+	}
+
 	public void addUserReward(UserReward userReward) {
-		if(userRewards.stream().filter(r -> !r.attraction.attractionName.equals(userReward.attraction)).count() == 0) {
+		if(!this.hasRewardForAttraction(userReward.attraction.attractionName)){
 			userRewards.add(userReward);
 		}
 	}
