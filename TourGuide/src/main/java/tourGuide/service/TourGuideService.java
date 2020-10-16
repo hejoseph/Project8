@@ -9,9 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -84,21 +86,47 @@ public class TourGuideService {
 	}
 	
 	public VisitedLocation trackUserLocation(User user) {
+//		StopWatch stopWatch = new StopWatch();
+//		stopWatch.start();
 		VisitedLocation visitedLocation = gpsUtil.getUserLocation(user.getUserId());
 		user.addToVisitedLocations(visitedLocation);
 		rewardsService.calculateRewards(user);
+//		stopWatch.stop();
+//		logger.debug("Tracker Time Elapsed: " + stopWatch.getTime() + " ms.");
 		return visitedLocation;
+	}
+
+	private void addAndSortToArrayOrderByAsc(List<Attraction> attractions, Attraction newAttraction, VisitedLocation visitedLocation){
+		if(attractions.size()==0){
+			attractions.add(newAttraction);
+			return;
+		}
+
+		double newDistance = rewardsService.getDistance(newAttraction, visitedLocation.location);
+
+		for(int i = 0;i<attractions.size();i++){
+			Attraction attraction = attractions.get(i);
+			double distance = rewardsService.getDistance(attraction, visitedLocation.location);
+
+			if(newDistance<distance){
+				attractions.add(i,newAttraction);
+				return;
+			}
+		}
+
+		attractions.add(newAttraction);
+
 	}
 
 	public List<Attraction> getNearByAttractions(VisitedLocation visitedLocation) {
 		List<Attraction> nearbyAttractions = new ArrayList<>();
 		for(Attraction attraction : gpsUtil.getAttractions()) {
-			if(rewardsService.isWithinAttractionProximity(attraction, visitedLocation.location)) {
-				nearbyAttractions.add(attraction);
-			}
+//			if(rewardsService.isWithinAttractionProximity(attraction, visitedLocation.location)) {
+//				nearbyAttractions.add(attraction);
+//			}
+			addAndSortToArrayOrderByAsc(nearbyAttractions, attraction, visitedLocation);
 		}
-		
-		return nearbyAttractions;
+		return nearbyAttractions.stream().limit(5).collect(Collectors.toList());
 	}
 	
 	private void addShutDownHook() {
