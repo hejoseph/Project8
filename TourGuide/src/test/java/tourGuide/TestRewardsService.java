@@ -14,6 +14,7 @@ import gpsUtil.location.Attraction;
 import gpsUtil.location.VisitedLocation;
 import rewardCentral.RewardCentral;
 import tourGuide.helper.InternalTestHelper;
+import tourGuide.module.GpsUtilCustom;
 import tourGuide.service.RewardsService;
 import tourGuide.service.TourGuideService;
 import tourGuide.user.User;
@@ -21,9 +22,10 @@ import tourGuide.user.UserReward;
 
 public class TestRewardsService {
 
+	public GpsUtilCustom gpsUtil = new GpsUtilCustom();
+
 	@Test
 	public void userGetRewards() {
-		GpsUtil gpsUtil = new GpsUtil();
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
 
 		InternalTestHelper.setInternalUserNumber(0);
@@ -40,16 +42,14 @@ public class TestRewardsService {
 	
 	@Test
 	public void isWithinAttractionProximity() {
-		GpsUtil gpsUtil = new GpsUtil();
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
 		Attraction attraction = gpsUtil.getAttractions().get(0);
 		assertTrue(rewardsService.isWithinAttractionProximity(attraction, attraction));
 	}
 	
-	@Ignore // Needs fixed - can throw ConcurrentModificationException
+	//@Ignore // Needs fixed - can throw ConcurrentModificationException
 	@Test
 	public void nearAllAttractions() {
-		GpsUtil gpsUtil = new GpsUtil();
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
 		rewardsService.setProximityBuffer(Integer.MAX_VALUE);
 

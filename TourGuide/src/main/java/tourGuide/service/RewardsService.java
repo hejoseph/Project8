@@ -1,7 +1,12 @@
 package tourGuide.service;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.time.StopWatch;
 import org.springframework.stereotype.Service;
 
 import gpsUtil.GpsUtil;
@@ -22,6 +27,8 @@ public class RewardsService {
 	private int attractionProximityRange = 200;
 	private final GpsUtil gpsUtil;
 	private final RewardCentral rewardsCentral;
+
+	ExecutorService es = Executors.newCachedThreadPool();
 	
 	public RewardsService(GpsUtil gpsUtil, RewardCentral rewardCentral) {
 		this.gpsUtil = gpsUtil;
@@ -35,14 +42,15 @@ public class RewardsService {
 	public void setDefaultProximityBuffer() {
 		proximityBuffer = defaultProximityBuffer;
 	}
-	
-	public void calculateRewards(User user) {
+
+	private void calculateRewardsWithoutThread(User user){
 		List<VisitedLocation> userLocations = user.getVisitedLocations();
 		List<Attraction> attractions = gpsUtil.getAttractions();
-		
-		for(VisitedLocation visitedLocation : userLocations) {
+
+		for(int i = 0; i<userLocations.size();i++){
+			VisitedLocation visitedLocation = userLocations.get(i);
 			for(Attraction attraction : attractions) {
-				if(user.getUserRewards().stream().filter(r -> r.attraction.attractionName.equals(attraction.attractionName)).count() == 0) {
+				if(!user.hasRewardForAttraction(attraction.attractionName)){
 					if(nearAttraction(visitedLocation, attraction)) {
 						user.addUserReward(new UserReward(visitedLocation, attraction, getRewardPoints(attraction, user)));
 					}
@@ -50,7 +58,26 @@ public class RewardsService {
 			}
 		}
 	}
-	
+
+
+	public void calculateRewards(User user) {
+//		StopWatch stopWatch = new StopWatch();
+//		stopWatch.start();
+
+//		Thread thread = new Thread(()->{
+		es.execute(new Runnable(){
+			@Override
+			public void run() {
+				calculateRewardsWithoutThread(user);
+			}
+		});
+//		thread.start();
+
+//		stopWatch.stop();
+//		System.out.println("Time Elapsed: " + stopWatch.getTime() + " ms.");
+
+	}
+
 	public boolean isWithinAttractionProximity(Attraction attraction, Location location) {
 		return getDistance(attraction, location) > attractionProximityRange ? false : true;
 	}
@@ -77,4 +104,8 @@ public class RewardsService {
         return statuteMiles;
 	}
 
+	public boolean waitThreadToFinish(int minutes) throws InterruptedException {
+		es.shutdown();
+		return es.awaitTermination(minutes, TimeUnit.MINUTES);
+	}
 }
