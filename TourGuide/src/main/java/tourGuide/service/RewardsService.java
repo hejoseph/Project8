@@ -2,9 +2,7 @@ package tourGuide.service;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import org.apache.commons.lang3.time.StopWatch;
 import org.springframework.stereotype.Service;
@@ -29,7 +27,7 @@ public class RewardsService {
 	private final RewardCentral rewardsCentral;
 
 	ExecutorService es = Executors.newCachedThreadPool();
-	
+
 	public RewardsService(GpsUtil gpsUtil, RewardCentral rewardCentral) {
 		this.gpsUtil = gpsUtil;
 		this.rewardsCentral = rewardCentral;
@@ -44,6 +42,10 @@ public class RewardsService {
 	}
 
 	private void calculateRewardsWithoutThread(User user){
+//		StopWatch stopWatch = new StopWatch();
+//		stopWatch.start();
+
+
 		List<VisitedLocation> userLocations = user.getVisitedLocations();
 		List<Attraction> attractions = gpsUtil.getAttractions();
 
@@ -57,20 +59,30 @@ public class RewardsService {
 				}
 			}
 		}
+
+//		stopWatch.stop();
+//		System.out.println("Time Elapsed: " + stopWatch.getTime() + " ms.");
+
 	}
 
+
+	public void reNewThreadPool(){
+		es = Executors.newCachedThreadPool();
+	}
 
 	public void calculateRewards(User user) {
 //		StopWatch stopWatch = new StopWatch();
 //		stopWatch.start();
 
 //		Thread thread = new Thread(()->{
+
 		es.execute(new Runnable(){
 			@Override
 			public void run() {
 				calculateRewardsWithoutThread(user);
 			}
 		});
+
 //		thread.start();
 
 //		stopWatch.stop();

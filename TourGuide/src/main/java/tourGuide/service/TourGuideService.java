@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -37,6 +37,8 @@ public class TourGuideService {
 	private final TripPricer tripPricer = new TripPricer();
 	public final Tracker tracker;
 	boolean testMode = true;
+
+	ExecutorService es = Executors.newCachedThreadPool();
 	
 	public TourGuideService(GpsUtil gpsUtil, RewardsService rewardsService) {
 		this.gpsUtil = gpsUtil;
@@ -85,12 +87,56 @@ public class TourGuideService {
 		return providers;
 	}
 	
-	public VisitedLocation trackUserLocation(User user) {
+	public VisitedLocation trackUserLocationWithoutThread(User user) {
 //		StopWatch stopWatch = new StopWatch();
 //		stopWatch.start();
 		VisitedLocation visitedLocation = gpsUtil.getUserLocation(user.getUserId());
 		user.addToVisitedLocations(visitedLocation);
 		rewardsService.calculateRewards(user);
+//		stopWatch.stop();
+//		logger.debug("Tracker Time Elapsed: " + stopWatch.getTime() + " ms.");
+		return visitedLocation;
+	}
+
+	public boolean waitThreadToFinish(int minutes) throws InterruptedException {
+		es.shutdown();
+		return es.awaitTermination(minutes, TimeUnit.MINUTES);
+	}
+
+
+	public VisitedLocation trackUserLocation(User user) {
+//		StopWatch stopWatch = new StopWatch();
+//		stopWatch.start();
+
+		es.execute(new Runnable(){
+			@Override
+			public void run() {
+//				rewardsService.reNewThreadPool();
+				trackUserLocationWithoutThread(user);
+//				try {
+//					rewardsService.waitThreadToFinish(1);
+//				} catch (InterruptedException e) {
+//					logger.error("error",e);
+//				}
+			}
+		});
+
+//		CompletableFuture<VisitedLocation> completableFuture = new CompletableFuture<>();
+//		Executors.newCachedThreadPool()
+//				.submit(() -> {
+//					completableFuture.complete(trackUserLocationWithoutThread(user));
+//					return null;
+//				});
+//
+		VisitedLocation visitedLocation = null;
+//		try {
+//			visitedLocation = completableFuture.get();
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		} catch (ExecutionException e) {
+//			e.printStackTrace();
+//		}
+
 //		stopWatch.stop();
 //		logger.debug("Tracker Time Elapsed: " + stopWatch.getTime() + " ms.");
 		return visitedLocation;

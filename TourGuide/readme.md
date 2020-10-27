@@ -10,13 +10,13 @@ Synchronized on method "hasRewardForAttraction"
 When not synchronized, 2 threads are adding reward at the same time for the same attraction
 
 Get Location :
-Users	Time (Seconds)	Improved Time
-100	    7	            0
-1000	75	            0
-5000	376	            0
-10000	762	            0
-50000	3791	        0   
-100000	7579	        0
+Users	Time (Seconds)	Improved Time   Improved Time (26 attractions)
+100	    7	            0               14
+1000	75	            1               16
+5000	376	            8               24
+10000	762	            19              34
+50000	3791	        150             387
+100000	7579	        0               
 
 
 Get Rewards : 
@@ -28,3 +28,5 @@ Users	Time (Seconds)	Improved Time   Improved Time (pool Thread)
 
 
 improved code with thread pool, wait all threads to finish before doing test
+
+improved perf for get location
