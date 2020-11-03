@@ -13,16 +13,15 @@ import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import gpsUtil.GpsUtil;
 import gpsUtil.location.Attraction;
 import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
 import tourGuide.helper.InternalTestHelper;
+import tourGuide.module.GpsUtilCustom;
 import tourGuide.tracker.Tracker;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
@@ -32,7 +31,7 @@ import tripPricer.TripPricer;
 @Service
 public class TourGuideService {
 	private Logger logger = LoggerFactory.getLogger(TourGuideService.class);
-	private final GpsUtil gpsUtil;
+	private final GpsUtilCustom gpsUtilCustom;
 	private final RewardsService rewardsService;
 	private final TripPricer tripPricer = new TripPricer();
 	public final Tracker tracker;
@@ -40,8 +39,8 @@ public class TourGuideService {
 
 	ExecutorService es = Executors.newCachedThreadPool();
 	
-	public TourGuideService(GpsUtil gpsUtil, RewardsService rewardsService) {
-		this.gpsUtil = gpsUtil;
+	public TourGuideService(GpsUtilCustom gpsUtilCustom, RewardsService rewardsService) {
+		this.gpsUtilCustom = gpsUtilCustom;
 		this.rewardsService = rewardsService;
 		
 		if(testMode) {
@@ -90,7 +89,7 @@ public class TourGuideService {
 	public VisitedLocation trackUserLocationWithoutThread(User user) {
 //		StopWatch stopWatch = new StopWatch();
 //		stopWatch.start();
-		VisitedLocation visitedLocation = gpsUtil.getUserLocation(user.getUserId());
+		VisitedLocation visitedLocation = gpsUtilCustom.getUserLocation(user.getUserId());
 		user.addToVisitedLocations(visitedLocation);
 		rewardsService.calculateRewards(user);
 //		stopWatch.stop();
@@ -166,7 +165,7 @@ public class TourGuideService {
 
 	public List<Attraction> getNearByAttractions(VisitedLocation visitedLocation) {
 		List<Attraction> nearbyAttractions = new ArrayList<>();
-		for(Attraction attraction : gpsUtil.getAttractions()) {
+		for(Attraction attraction : gpsUtilCustom.getAttractions()) {
 //			if(rewardsService.isWithinAttractionProximity(attraction, visitedLocation.location)) {
 //				nearbyAttractions.add(attraction);
 //			}

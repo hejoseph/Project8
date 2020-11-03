@@ -1,17 +1,15 @@
 package tourGuide.service;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.*;
 
-import org.apache.commons.lang3.time.StopWatch;
 import org.springframework.stereotype.Service;
 
-import gpsUtil.GpsUtil;
 import gpsUtil.location.Attraction;
 import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
 import rewardCentral.RewardCentral;
+import tourGuide.module.GpsUtilCustom;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
 
@@ -23,13 +21,13 @@ public class RewardsService {
     private int defaultProximityBuffer = 10;
 	private int proximityBuffer = defaultProximityBuffer;
 	private int attractionProximityRange = 200;
-	private final GpsUtil gpsUtil;
+	private final GpsUtilCustom gpsUtilCustom;
 	private final RewardCentral rewardsCentral;
 
 	ExecutorService es = Executors.newCachedThreadPool();
 
-	public RewardsService(GpsUtil gpsUtil, RewardCentral rewardCentral) {
-		this.gpsUtil = gpsUtil;
+	public RewardsService(GpsUtilCustom gpsUtilCustom, RewardCentral rewardCentral) {
+		this.gpsUtilCustom = gpsUtilCustom;
 		this.rewardsCentral = rewardCentral;
 	}
 	
@@ -47,7 +45,7 @@ public class RewardsService {
 
 
 		List<VisitedLocation> userLocations = user.getVisitedLocations();
-		List<Attraction> attractions = gpsUtil.getAttractions();
+		List<Attraction> attractions = gpsUtilCustom.getAttractions();
 
 		for(int i = 0; i<userLocations.size();i++){
 			VisitedLocation visitedLocation = userLocations.get(i);

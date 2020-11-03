@@ -12,7 +12,7 @@ import tourGuide.service.RewardsService;
 public class TourGuideModule {
 	
 	@Bean
-	public GpsUtil getGpsUtil() {
+	public GpsUtilCustom getGpsUtil() {
 		return new GpsUtilCustom();
 	}
 	
