@@ -61,6 +61,7 @@ public class RewardsService {
 //		stopWatch.stop();
 //		System.out.println("Time Elapsed: " + stopWatch.getTime() + " ms.");
 
+		user.setRewardCalled(true);
 	}
 
 

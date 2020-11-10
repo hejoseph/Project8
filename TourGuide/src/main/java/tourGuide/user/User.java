@@ -18,11 +18,15 @@ public class User {
 	private List<UserReward> userRewards = new ArrayList<>();
 	private UserPreferences userPreferences = new UserPreferences();
 	private List<Provider> tripDeals = new ArrayList<>();
+
+	private boolean rewardCalled;
+
 	public User(UUID userId, String userName, String phoneNumber, String emailAddress) {
 		this.userId = userId;
 		this.userName = userName;
 		this.phoneNumber = phoneNumber;
 		this.emailAddress = emailAddress;
+		this.rewardCalled = false;
 	}
 	
 	public UUID getUserId() {
@@ -56,7 +60,15 @@ public class User {
 	public Date getLatestLocationTimestamp() {
 		return latestLocationTimestamp;
 	}
-	
+
+	public boolean isRewardCalled() {
+		return rewardCalled;
+	}
+
+	public void setRewardCalled(boolean rewardCalled) {
+		this.rewardCalled = rewardCalled;
+	}
+
 	public void addToVisitedLocations(VisitedLocation visitedLocation) {
 		visitedLocations.add(visitedLocation);
 	}
@@ -74,7 +86,10 @@ public class User {
 
 		for(int i=0; i<this.getUserRewards().size();i++){
 			UserReward reward = this.getUserRewards().get(i);
-			if(reward.attraction.attractionName.equals(attractionName)){
+			if(reward
+					.attraction
+					.attractionName
+					.equals(attractionName)){
 				return true;
 			}
 		}
