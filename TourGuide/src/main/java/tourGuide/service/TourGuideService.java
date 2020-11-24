@@ -2,47 +2,56 @@ package tourGuide.service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import gpsUtil.location.Attraction;
-import gpsUtil.location.Location;
-import gpsUtil.location.VisitedLocation;
+import org.springframework.web.client.RestTemplate;
 import tourGuide.helper.InternalTestHelper;
-import tourGuide.module.GpsUtilCustom;
+import tourGuide.model.Attraction;
+import tourGuide.model.Location;
+import tourGuide.model.Provider;
+import tourGuide.model.VisitedLocation;
 import tourGuide.tracker.Tracker;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
-import tripPricer.Provider;
-import tripPricer.TripPricer;
 
 @Service
 public class TourGuideService {
 	private Logger logger = LoggerFactory.getLogger(TourGuideService.class);
-	private final GpsUtilCustom gpsUtilCustom;
-	private final RewardsService rewardsService;
-	private final TripPricer tripPricer = new TripPricer();
+//	private final GpsUtilCustom gpsUtilCustom;
+//	private final RewardsService rewardsService;
+//	private final TripPricer tripPricer = new TripPricer();
 	public final Tracker tracker;
 	boolean testMode = true;
 
+	@Autowired
+	public GpsUtilService gpsUtilService;
+
+	@Autowired
+	public RewardsService rewardsService;
+
 	ExecutorService es = Executors.newCachedThreadPool();
-	
-	public TourGuideService(GpsUtilCustom gpsUtilCustom, RewardsService rewardsService) {
-		this.gpsUtilCustom = gpsUtilCustom;
-		this.rewardsService = rewardsService;
-		
+
+	public RestTemplate restTemplate;
+	public String serviceUrl;
+
+	public TourGuideService(/*GpsUtilCustom gpsUtilCustom, RewardsService rewardsService*/) {
+//		this.gpsUtilCustom = gpsUtilCustom;
+//		this.rewardsService = rewardsService;
+
+		this.restTemplate = new RestTemplate();
+		this.serviceUrl = "http://localhost:9093";
+		this.serviceUrl = serviceUrl.startsWith("http") ?
+				serviceUrl : "http://" + serviceUrl;
+
 		if(testMode) {
 			logger.info("TestMode enabled");
 			logger.debug("Initializing users");
@@ -51,6 +60,8 @@ public class TourGuideService {
 		}
 		tracker = new Tracker(this);
 		addShutDownHook();
+
+
 	}
 	
 	public List<UserReward> getUserRewards(User user) {
@@ -80,8 +91,19 @@ public class TourGuideService {
 	
 	public List<Provider> getTripDeals(User user) {
 		int cumulatativeRewardPoints = user.getUserRewards().stream().mapToInt(i -> i.getRewardPoints()).sum();
-		List<Provider> providers = tripPricer.getPrice(tripPricerApiKey, user.getUserId(), user.getUserPreferences().getNumberOfAdults(), 
+
+		ResponseEntity<Provider[]> response = restTemplate.getForEntity(serviceUrl+"/getPrice" +
+				"?apiKey={apiKey}&attractionId={attractionId}" +
+				"&adults={adults}&children={children}&nightsStay={nightsStay}" +
+				"&rewardsPoints={rewardsPoints}",Provider[].class,
+				tripPricerApiKey, user.getUserId(), user.getUserPreferences().getNumberOfAdults(),
 				user.getUserPreferences().getNumberOfChildren(), user.getUserPreferences().getTripDuration(), cumulatativeRewardPoints);
+
+//				List<Provider> providers = tripPricer.getPrice(tripPricerApiKey, user.getUserId(), user.getUserPreferences().getNumberOfAdults(),
+//				user.getUserPreferences().getNumberOfChildren(), user.getUserPreferences().getTripDuration(), cumulatativeRewardPoints);
+
+		List<Provider> providers = Arrays.asList(response.getBody());
+
 		user.setTripDeals(providers);
 		return providers;
 	}
@@ -89,7 +111,7 @@ public class TourGuideService {
 	public VisitedLocation trackUserLocationWithoutThread(User user) {
 //		StopWatch stopWatch = new StopWatch();
 //		stopWatch.start();
-		VisitedLocation visitedLocation = gpsUtilCustom.getUserLocation(user.getUserId());
+		VisitedLocation visitedLocation = gpsUtilService.getUserLocation(user.getUserId());
 		user.addToVisitedLocations(visitedLocation);
 		rewardsService.calculateRewards(user);
 //		stopWatch.stop();
@@ -165,7 +187,7 @@ public class TourGuideService {
 
 	public List<Attraction> getNearByAttractions(VisitedLocation visitedLocation) {
 		List<Attraction> nearbyAttractions = new ArrayList<>();
-		for(Attraction attraction : gpsUtilCustom.getAttractions()) {
+		for(Attraction attraction : gpsUtilService.getAttractions()) {
 //			if(rewardsService.isWithinAttractionProximity(attraction, visitedLocation.location)) {
 //				nearbyAttractions.add(attraction);
 //			}

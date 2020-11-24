@@ -3,13 +3,13 @@ package tourGuide.service;
 import java.util.List;
 import java.util.concurrent.*;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import gpsUtil.location.Attraction;
-import gpsUtil.location.Location;
-import gpsUtil.location.VisitedLocation;
-import rewardCentral.RewardCentral;
-import tourGuide.module.GpsUtilCustom;
+import org.springframework.web.client.RestTemplate;
+import tourGuide.model.Attraction;
+import tourGuide.model.Location;
+import tourGuide.model.VisitedLocation;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
 
@@ -17,18 +17,29 @@ import tourGuide.user.UserReward;
 public class RewardsService {
     private static final double STATUTE_MILES_PER_NAUTICAL_MILE = 1.15077945;
 
+    @Autowired
+	public GpsUtilService gpsUtilService;
+
 	// proximity in miles
     private int defaultProximityBuffer = 10;
 	private int proximityBuffer = defaultProximityBuffer;
 	private int attractionProximityRange = 200;
-	private final GpsUtilCustom gpsUtilCustom;
-	private final RewardCentral rewardsCentral;
+//	private final GpsUtilCustom gpsUtilCustom;
+//	private final RewardCentral rewardsCentral;
+
+	public RestTemplate restTemplate;
+	public String serviceUrl;
+
 
 	ExecutorService es = Executors.newCachedThreadPool();
 
-	public RewardsService(GpsUtilCustom gpsUtilCustom, RewardCentral rewardCentral) {
-		this.gpsUtilCustom = gpsUtilCustom;
-		this.rewardsCentral = rewardCentral;
+	public RewardsService(/*GpsUtilCustom gpsUtilCustom, RewardCentral rewardCentral*/) {
+//		this.gpsUtilCustom = gpsUtilCustom;
+//		this.rewardsCentral = rewardCentral;
+		this.restTemplate = new RestTemplate();
+		this.serviceUrl = "http://localhost:9094";
+		this.serviceUrl = serviceUrl.startsWith("http") ?
+				serviceUrl : "http://" + serviceUrl;
 	}
 	
 	public void setProximityBuffer(int proximityBuffer) {
@@ -45,7 +56,7 @@ public class RewardsService {
 
 
 		List<VisitedLocation> userLocations = user.getVisitedLocations();
-		List<Attraction> attractions = gpsUtilCustom.getAttractions();
+		List<Attraction> attractions = gpsUtilService.getAttractions();
 
 		for(int i = 0; i<userLocations.size();i++){
 			VisitedLocation visitedLocation = userLocations.get(i);
@@ -97,8 +108,13 @@ public class RewardsService {
 		return getDistance(attraction, visitedLocation.location) > proximityBuffer ? false : true;
 	}
 	
-	private int getRewardPoints(Attraction attraction, User user) {
-		return rewardsCentral.getAttractionRewardPoints(attraction.attractionId, user.getUserId());
+	public int getRewardPoints(Attraction attraction, User user) {
+		Integer point = restTemplate.getForObject(serviceUrl
+				+ "/getAttractionRewardPoints?attractionId={attractionId}&userId={userId}", Integer.class, attraction.attractionId, user.getUserId());
+
+		return point;
+
+//		return rewardsCentral.getAttractionRewardPoints(attraction.attractionId, user.getUserId());
 	}
 	
 	public double getDistance(Location loc1, Location loc2) {
