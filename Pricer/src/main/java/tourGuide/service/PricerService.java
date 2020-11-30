@@ -12,6 +12,10 @@ public class PricerService {
 
     public TripPricer tripPricer;
 
+    public PricerService(){
+        tripPricer = new TripPricer();
+    }
+
     public List<Provider> getPrice(String apiKey, UUID attractionId, int adults, int children, int nightsStay, int rewardsPoints){
         return tripPricer.getPrice(apiKey, attractionId, adults, children, nightsStay, rewardsPoints);
     }

@@ -1,5 +1,6 @@
 package tourGuide;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,12 +35,16 @@ public class TourGuideController {
     public String index() {
         return "Greetings from TourGuide!";
     }
-    
+
+        @RequestMapping("/getAllUsername")
+    public List<User> getAllUserName(){
+        return tourGuideService.getAllUsers();
+    }
+
     @RequestMapping("/getLocation") 
     public String getLocation(@RequestParam String userName) {
-//    	VisitedLocation visitedLocation = tourGuideService.getUserLocation(getUser(userName));
-//		return JsonStream.serialize(visitedLocation.location);
-        return "";
+    	VisitedLocation visitedLocation = tourGuideService.getUserLocation(getUser(userName));
+		return JsonStream.serialize(visitedLocation.location);
     }
     
     //  TODO: Change this method to no longer return a List of Attractions.
@@ -53,9 +58,8 @@ public class TourGuideController {
         //    Note: Attraction reward points can be gathered from RewardsCentral
     @RequestMapping("/getNearbyAttractions") 
     public String getNearbyAttractions(@RequestParam String userName) {
-//    	VisitedLocation visitedLocation = tourGuideService.getUserLocation(getUser(userName));
-//    	return JsonStream.serialize(tourGuideService.getNearByAttractions(visitedLocation));
-        return "";
+    	VisitedLocation visitedLocation = tourGuideService.getUserLocation(getUser(userName));
+    	return JsonStream.serialize(tourGuideService.getNearByAttractions(visitedLocation));
     }
     
     @RequestMapping("/getRewards") 
@@ -74,8 +78,14 @@ public class TourGuideController {
     	//        "019b04a9-067a-4c76-8817-ee75088c3822": {"longitude":-48.188821,"latitude":74.84371} 
     	//        ...
     	//     }
-    	
-    	return JsonStream.serialize("");
+
+        HashMap<String, VisitedLocation> locationHashMap = new HashMap<>();
+        List<User> users = tourGuideService.getAllUsers();
+        for(User user : users){
+            VisitedLocation lastLocation = user.getLastVisitedLocation();
+            locationHashMap.put(user.getUserId().toString(), lastLocation);
+        }
+    	return JsonStream.serialize(locationHashMap);
     }
     
     @RequestMapping("/getTripDeals")

@@ -128,19 +128,19 @@ public class TourGuideService {
 	public VisitedLocation trackUserLocation(User user) {
 //		StopWatch stopWatch = new StopWatch();
 //		stopWatch.start();
-
-		es.execute(new Runnable(){
-			@Override
-			public void run() {
+		VisitedLocation visitedLocation = null;
+//		es.execute(new Runnable(){
+//			@Override
+//			public void run() {
 //				rewardsService.reNewThreadPool();
-				trackUserLocationWithoutThread(user);
+				visitedLocation = trackUserLocationWithoutThread(user);
 //				try {
 //					rewardsService.waitThreadToFinish(1);
 //				} catch (InterruptedException e) {
 //					logger.error("error",e);
 //				}
-			}
-		});
+//			}
+//		});
 
 //		CompletableFuture<VisitedLocation> completableFuture = new CompletableFuture<>();
 //		Executors.newCachedThreadPool()
@@ -149,7 +149,7 @@ public class TourGuideService {
 //					return null;
 //				});
 //
-		VisitedLocation visitedLocation = null;
+
 //		try {
 //			visitedLocation = completableFuture.get();
 //		} catch (InterruptedException e) {

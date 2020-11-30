@@ -65,11 +65,9 @@
         </dependency>
 
         <dependency>
-            <groupId>gpsUtil</groupId>
-            <artifactId>gpsUtil</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/libs/gpsUtil.jar</systemPath>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.1</version>
         </dependency>
 
 <!--        <dependency>-->
@@ -80,21 +78,29 @@
 <!--            <systemPath>${project.basedir}/libs/gpsUtil.jar</systemPath>-->
 <!--        </dependency>-->
 
-        <dependency>
-            <groupId>RewardCentral</groupId>
-            <artifactId>RewardCentral</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/libs/RewardCentral.jar</systemPath>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>gpsUtil</groupId>-->
+<!--            <artifactId>gpsUtil</artifactId>-->
+<!--            <version>1.0</version>-->
+<!--            <scope>system</scope>-->
+<!--            <systemPath>${project.basedir}/libs/gpsUtil.jar</systemPath>-->
+<!--        </dependency>-->
 
-        <dependency>
-            <groupId>TripPricer</groupId>
-            <artifactId>TripPricer</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/libs/TripPricer.jar</systemPath>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>RewardCentral</groupId>-->
+<!--            <artifactId>RewardCentral</artifactId>-->
+<!--            <version>1.0</version>-->
+<!--            <scope>system</scope>-->
+<!--            <systemPath>${project.basedir}/libs/RewardCentral.jar</systemPath>-->
+<!--        </dependency>-->
+
+<!--        <dependency>-->
+<!--            <groupId>TripPricer</groupId>-->
+<!--            <artifactId>TripPricer</artifactId>-->
+<!--            <version>1.0</version>-->
+<!--            <scope>system</scope>-->
+<!--            <systemPath>${project.basedir}/libs/TripPricer.jar</systemPath>-->
+<!--        </dependency>-->
 
 <!--        <dependency>-->
 <!--            <groupId></groupId>-->

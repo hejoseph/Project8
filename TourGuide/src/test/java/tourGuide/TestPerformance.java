@@ -14,7 +14,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import rewardCentral.RewardCentral;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.model.Attraction;
 import tourGuide.model.VisitedLocation;
@@ -55,7 +54,7 @@ public class TestPerformance {
 	public void highVolumeTrackLocation() throws InterruptedException {
 		RewardsService rewardsService = new RewardsService(/*gpsUtil, new RewardCentral()*/);
 		// Users should be incremented up to 100,000, and test finishes within 15 minutes
-		InternalTestHelper.setInternalUserNumber(10000);
+		InternalTestHelper.setInternalUserNumber(100);
 		TourGuideService tourGuideService = new TourGuideService(/*gpsUtil, rewardsService*/);
 
 		List<User> allUsers = new ArrayList<>();
