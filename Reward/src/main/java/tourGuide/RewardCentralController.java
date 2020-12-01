@@ -16,9 +16,13 @@ public class RewardCentralController {
     @Autowired
     public RewardCentralService rewardCentralService;
 
+    public int times = 0;
+
     @RequestMapping("/getAttractionRewardPoints")
     public int getLocation(@RequestParam UUID attractionId, @RequestParam UUID userId) {
-		return rewardCentralService.getAttractionRewardPoints(attractionId, userId);
+//		times++;
+//		System.out.println("called getAttractionRewardPoints : "+times);
+        return rewardCentralService.getAttractionRewardPoints(attractionId, userId);
     }
 
 }

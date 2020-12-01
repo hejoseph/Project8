@@ -31,7 +31,8 @@ public class RewardsService {
 	public String serviceUrl;
 
 
-	ExecutorService es = Executors.newCachedThreadPool();
+//	ExecutorService es = Executors.newCachedThreadPool();
+	ExecutorService es = Executors.newFixedThreadPool(5000);
 
 	public RewardsService(/*GpsUtilCustom gpsUtilCustom, RewardCentral rewardCentral*/) {
 //		this.gpsUtilCustom = gpsUtilCustom;

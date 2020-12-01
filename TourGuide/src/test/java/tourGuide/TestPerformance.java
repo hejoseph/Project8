@@ -13,7 +13,10 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.model.Attraction;
 import tourGuide.model.VisitedLocation;
@@ -23,11 +26,18 @@ import tourGuide.service.TourGuideService;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class TestPerformance {
-
 
 	@Autowired
 	public GpsUtilService gpsUtilService;
+
+	@Autowired
+	public RewardsService rewardsService;
+
+	@Autowired
+	public TourGuideService tourGuideService;
 
 	/*
 	 * A note on performance improvements:
@@ -52,11 +62,6 @@ public class TestPerformance {
 //	@Ignore
 	@Test
 	public void highVolumeTrackLocation() throws InterruptedException {
-		RewardsService rewardsService = new RewardsService(/*gpsUtil, new RewardCentral()*/);
-		// Users should be incremented up to 100,000, and test finishes within 15 minutes
-		InternalTestHelper.setInternalUserNumber(100);
-		TourGuideService tourGuideService = new TourGuideService(/*gpsUtil, rewardsService*/);
-
 		List<User> allUsers = new ArrayList<>();
 		allUsers = tourGuideService.getAllUsers();
 		
@@ -83,26 +88,21 @@ public class TestPerformance {
 		assertTrue(TimeUnit.MINUTES.toSeconds(15) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
 	}
 
-	@Ignore
 	@Test
 	public void highVolumeGetRewards() throws ExecutionException, InterruptedException {
 		int stopTestAfterSeconds = 180;
-		RewardsService rewardsService = new RewardsService(/*gpsUtil, new RewardCentral()*/);
-
 		// Users should be incremented up to 100,000, and test finishes within 20 minutes
-		InternalTestHelper.setInternalUserNumber(100);
+//		InternalTestHelper.setInternalUserNumber(100000);
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
-		TourGuideService tourGuideService = new TourGuideService(/*gpsUtil, rewardsService*/);
-		
+
 	    Attraction attraction = gpsUtilService.getAttractions().get(0);
 		List<User> allUsers = new ArrayList<>();
 		allUsers = tourGuideService.getAllUsers();
 		allUsers.forEach(u -> u.addToVisitedLocations(new VisitedLocation(u.getUserId(), attraction, new Date())));
 
-//		rewardsService.reNewThreadPool();
 	    allUsers.forEach(u -> rewardsService.calculateRewards(u));
-		boolean finished = rewardsService.waitThreadToFinish(2);
+		boolean finished = rewardsService.waitThreadToFinish(20);
 
 	    for(User user : allUsers) {
 //			assertTrue(user.getUserRewards().size() > 0);

@@ -38,7 +38,8 @@ public class TourGuideService {
 	@Autowired
 	public RewardsService rewardsService;
 
-	ExecutorService es = Executors.newCachedThreadPool();
+//	ExecutorService es = Executors.newCachedThreadPool();
+	ExecutorService es = Executors.newFixedThreadPool(1000);
 
 	public RestTemplate restTemplate;
 	public String serviceUrl;
@@ -129,18 +130,19 @@ public class TourGuideService {
 //		StopWatch stopWatch = new StopWatch();
 //		stopWatch.start();
 		VisitedLocation visitedLocation = null;
-//		es.execute(new Runnable(){
-//			@Override
-//			public void run() {
+		es.execute(new Runnable(){
+			@Override
+			public void run() {
 //				rewardsService.reNewThreadPool();
-				visitedLocation = trackUserLocationWithoutThread(user);
+//				visitedLocation = trackUserLocationWithoutThread(user);
+				trackUserLocationWithoutThread(user);
 //				try {
 //					rewardsService.waitThreadToFinish(1);
 //				} catch (InterruptedException e) {
 //					logger.error("error",e);
 //				}
-//			}
-//		});
+			}
+		});
 
 //		CompletableFuture<VisitedLocation> completableFuture = new CompletableFuture<>();
 //		Executors.newCachedThreadPool()
@@ -161,6 +163,7 @@ public class TourGuideService {
 //		stopWatch.stop();
 //		logger.debug("Tracker Time Elapsed: " + stopWatch.getTime() + " ms.");
 		return visitedLocation;
+//		return null;
 	}
 
 	private void addAndSortToArrayOrderByAsc(List<Attraction> attractions, Attraction newAttraction, VisitedLocation visitedLocation){

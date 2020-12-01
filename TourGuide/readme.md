@@ -11,7 +11,7 @@ When not synchronized, 2 threads are adding reward at the same time for the same
 
 Get Location :
 Users	Time (Seconds)	Improved Time   Improved Time (26 attractions)
-100	    7	            0               14
+100	    7	            0 -> 6              14
 1000	75	            1               16
 5000	376	            8               24
 10000	762	            19              34
@@ -22,9 +22,9 @@ Users	Time (Seconds)	Improved Time   Improved Time (26 attractions)
 Get Rewards : 
 Users	Time (Seconds)	Improved Time   Improved Time (pool Thread)
 100	    44	            2               2
-1000	472	            3               2
-10000	5820	        22              11
-100000	64020	        496             111
+1000	472	            4               2
+10000	5820	        22 -> 28              11
+100000	64020	        496 -> 252             111
 
 
 improved code with thread pool, wait all threads to finish before doing test
