@@ -112,8 +112,19 @@ public class TourGuideService {
 		user.setTripDeals(providers);
 		return providers;
 	}
-	
-	public VisitedLocation trackUserLocationWithoutThread(User user) {
+
+	public VisitedLocation trackUserLocationWithRewardThread(User user) {
+//		StopWatch stopWatch = new StopWatch();
+//		stopWatch.start();
+		VisitedLocation visitedLocation = gpsUtilService.getUserLocation(user.getUserId());
+		user.addToVisitedLocations(visitedLocation);
+		rewardsService.calculateRewardsWrapperWithThread(user);
+//		stopWatch.stop();
+//		logger.debug("Tracker Time Elapsed: " + stopWatch.getTime() + " ms.");
+		return visitedLocation;
+	}
+
+	public VisitedLocation trackUserLocation(User user) {
 //		StopWatch stopWatch = new StopWatch();
 //		stopWatch.start();
 		VisitedLocation visitedLocation = gpsUtilService.getUserLocation(user.getUserId());
@@ -130,21 +141,13 @@ public class TourGuideService {
 	}
 
 
-	public VisitedLocation trackUserLocation(User user) {
-//		StopWatch stopWatch = new StopWatch();
-//		stopWatch.start();
-		VisitedLocation visitedLocation = null;
-//		es.execute(new Runnable(){
-//			@Override
-//			public void run() {
-//				trackUserLocationWithoutThread(user);
-//				try {
-//					rewardsService.waitThreadToFinish(1);
-//				} catch (InterruptedException e) {
-//					logger.error("error",e);
-//				}
-//			}
-//		});
+	public void trackUserLocationWrapperWithThread(User user) {
+		es.execute(new Runnable(){
+			@Override
+			public void run() {
+				trackUserLocationWithRewardThread(user);
+			}
+		});
 
 //		CompletableFuture<VisitedLocation> completableFuture = new CompletableFuture<>();
 //		Executors.newCachedThreadPool()
@@ -162,26 +165,26 @@ public class TourGuideService {
 //			e.printStackTrace();
 //		}
 
-		Callable<VisitedLocation> callable = new Callable<VisitedLocation>() {
-			@Override
-			public VisitedLocation call() throws Exception {
-				return trackUserLocationWithoutThread(user);
-			}
-		};
+//		Callable<VisitedLocation> callable = new Callable<VisitedLocation>() {
+//			@Override
+//			public VisitedLocation call() throws Exception {
+//				return trackUserLocationWithoutThread(user);
+//			}
+//		};
 
-		Future<VisitedLocation> future = es.submit(callable);
-		try{
-//			waitThreadToFinish(2);
-			visitedLocation = future.get();
-		}catch(InterruptedException e){
-			System.out.println("problem wait thread");
-		}catch(ExecutionException ee){
-			System.out.println("problem future get");
-		}
+//		Future<VisitedLocation> future = es.submit(callable);
+//		try{
+////			waitThreadToFinish(2);
+//			visitedLocation = future.get();
+//		}catch(InterruptedException e){
+//			System.out.println("problem wait thread");
+//		}catch(ExecutionException ee){
+//			System.out.println("problem future get");
+//		}
 
 //		stopWatch.stop();
 //		logger.debug("Tracker Time Elapsed: " + stopWatch.getTime() + " ms.");
-		return visitedLocation;
+//		return visitedLocation;
 //		return null;
 	}
 

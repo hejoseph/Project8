@@ -6,11 +6,9 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.*;
 
 import org.apache.commons.lang3.time.StopWatch;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
@@ -24,7 +22,6 @@ import tourGuide.service.GpsUtilService;
 import tourGuide.service.RewardsService;
 import tourGuide.service.TourGuideService;
 import tourGuide.user.User;
-import tourGuide.user.UserReward;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -73,7 +70,7 @@ public class TestPerformance {
 
 //		rewardsService.setProximityBuffer(Integer.MAX_VALUE);
 		for(User user : allUsers) {
-			tourGuideService.trackUserLocation(user);
+			tourGuideService.trackUserLocationWrapperWithThread(user);
 		}
 		tourGuideService.waitThreadToFinish(10);
 		rewardsService.waitThreadToFinish(10);
@@ -105,7 +102,7 @@ public class TestPerformance {
 		allUsers = tourGuideService.getAllUsers();
 		allUsers.forEach(u -> u.addToVisitedLocations(new VisitedLocation(u.getUserId(), attraction, new Date())));
 
-	    allUsers.forEach(u -> rewardsService.calculateRewards(u));
+	    allUsers.forEach(u -> rewardsService.calculateRewardsWrapperWithThread(u));
 		boolean finished = rewardsService.waitThreadToFinish(20);
 
 	    for(User user : allUsers) {

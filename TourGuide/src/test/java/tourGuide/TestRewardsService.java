@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
@@ -41,19 +40,20 @@ public class TestRewardsService {
 	public void userGetRewards() throws InterruptedException, ExecutionException {
 		InternalTestHelper.setInternalUserNumber(0);
 		tourGuideService.initializeUserAndTracker();
+		rewardsService.setProximityBuffer(10);
 
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
 		Attraction attraction = gpsUtilService.getAttractions().get(0);
 		user.addToVisitedLocations(new VisitedLocation(user.getUserId(), attraction, new Date()));
 		tourGuideService.trackUserLocation(user);
-		tourGuideService.waitThreadToFinish(2);
-		rewardsService.waitThreadToFinish(2);
+//		tourGuideService.waitThreadToFinish(2);
+//		rewardsService.waitThreadToFinish(2);
 		List<UserReward> userRewards = user.getUserRewards();
 		tourGuideService.tracker.stopTracking();
-		assertTrue(userRewards.size() == 1);
+		assertTrue(user.isRewardCalled());
+		assertEquals(1, userRewards.size());
 	}
 
-	@Ignore
 	@Test
 	public void isWithinAttractionProximity() {
 		Attraction attraction = gpsUtilService.getAttractions().get(0);
@@ -66,7 +66,7 @@ public class TestRewardsService {
 		InternalTestHelper.setInternalUserNumber(1);
 		tourGuideService.initializeUserAndTracker();
 		User user = tourGuideService.getAllUsers().get(0);
-		rewardsService.calculateRewards(user);
+		rewardsService.calculateRewardsWrapperWithThread(user);
 		rewardsService.waitThreadToFinish(1);
 		List<UserReward> userRewards = tourGuideService.getUserRewards(user);
 		tourGuideService.tracker.stopTracking();

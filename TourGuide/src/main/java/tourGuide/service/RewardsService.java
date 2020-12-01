@@ -32,7 +32,7 @@ public class RewardsService {
 
 
 //	ExecutorService es = Executors.newCachedThreadPool();
-	ExecutorService es = Executors.newFixedThreadPool(5000);
+	ExecutorService es = Executors.newFixedThreadPool(2000);
 
 	public RewardsService(/*GpsUtilCustom gpsUtilCustom, RewardCentral rewardCentral*/) {
 //		this.gpsUtilCustom = gpsUtilCustom;
@@ -51,7 +51,7 @@ public class RewardsService {
 		proximityBuffer = defaultProximityBuffer;
 	}
 
-	private void calculateRewardsWithoutThread(User user){
+	public void calculateRewards(User user){
 //		StopWatch stopWatch = new StopWatch();
 //		stopWatch.start();
 
@@ -81,7 +81,7 @@ public class RewardsService {
 		es = Executors.newCachedThreadPool();
 	}
 
-	public void calculateRewards(User user) {
+	public void calculateRewardsWrapperWithThread(User user) {
 //		StopWatch stopWatch = new StopWatch();
 //		stopWatch.start();
 
@@ -90,7 +90,7 @@ public class RewardsService {
 		es.execute(new Runnable(){
 			@Override
 			public void run() {
-				calculateRewardsWithoutThread(user);
+				calculateRewards(user);
 			}
 		});
 
