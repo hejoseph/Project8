@@ -5,7 +5,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -35,9 +37,15 @@ public class TestTourGuideService {
 	@Autowired
 	public TourGuideService tourGuideService;
 
+	@Before
+	public void beforeEachTest(){
+
+	}
+
 	@Test
 	public void getUserLocation() {
 		InternalTestHelper.setInternalUserNumber(0);
+		tourGuideService.initializeUserAndTracker();
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
 		VisitedLocation visitedLocation = tourGuideService.trackUserLocation(user);
 		tourGuideService.tracker.stopTracking();
@@ -47,8 +55,8 @@ public class TestTourGuideService {
 	@Test
 	public void addUser() {
 		InternalTestHelper.setInternalUserNumber(0);
-		TourGuideService tourGuideService = new TourGuideService(/*gpsUtilCustom, rewardsService*/);
-		
+		tourGuideService.initializeUserAndTracker();
+
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
 		User user2 = new User(UUID.randomUUID(), "jon2", "000", "jon2@tourGuide.com");
 
@@ -67,8 +75,8 @@ public class TestTourGuideService {
 	@Test
 	public void getAllUsers() {
 		InternalTestHelper.setInternalUserNumber(0);
-		TourGuideService tourGuideService = new TourGuideService(/*gpsUtilCustom, rewardsService*/);
-		
+		tourGuideService.initializeUserAndTracker();
+
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
 		User user2 = new User(UUID.randomUUID(), "jon2", "000", "jon2@tourGuide.com");
 
@@ -98,7 +106,7 @@ public class TestTourGuideService {
 	@Test
 	public void getNearbyAttractions() {
 		InternalTestHelper.setInternalUserNumber(0);
-
+		tourGuideService.initializeUserAndTracker();
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
 		VisitedLocation visitedLocation = tourGuideService.trackUserLocation(user);
 		
@@ -112,7 +120,7 @@ public class TestTourGuideService {
 	@Test
 	public void getTripDeals() {
 		InternalTestHelper.setInternalUserNumber(0);
-
+		tourGuideService.initializeUserAndTracker();
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
 
 		List<Provider> providers = tourGuideService.getTripDeals(user);

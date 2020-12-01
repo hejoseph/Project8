@@ -29,7 +29,7 @@ public class TourGuideService {
 //	private final GpsUtilCustom gpsUtilCustom;
 //	private final RewardsService rewardsService;
 //	private final TripPricer tripPricer = new TripPricer();
-	public final Tracker tracker;
+	public Tracker tracker;
 	boolean testMode = true;
 
 	@Autowired
@@ -39,7 +39,7 @@ public class TourGuideService {
 	public RewardsService rewardsService;
 
 //	ExecutorService es = Executors.newCachedThreadPool();
-	ExecutorService es = Executors.newFixedThreadPool(1000);
+	ExecutorService es;
 
 	public RestTemplate restTemplate;
 	public String serviceUrl;
@@ -53,6 +53,10 @@ public class TourGuideService {
 		this.serviceUrl = serviceUrl.startsWith("http") ?
 				serviceUrl : "http://" + serviceUrl;
 
+	}
+
+	public void initializeUserAndTracker(){
+		clearInternalUser();
 		if(testMode) {
 			logger.info("TestMode enabled");
 			logger.debug("Initializing users");
@@ -61,8 +65,7 @@ public class TourGuideService {
 		}
 		tracker = new Tracker(this);
 		addShutDownHook();
-
-
+		es = Executors.newFixedThreadPool(1000);
 	}
 	
 	public List<UserReward> getUserRewards(User user) {
@@ -87,6 +90,7 @@ public class TourGuideService {
 	public void addUser(User user) {
 		if(!internalUserMap.containsKey(user.getUserName())) {
 			internalUserMap.put(user.getUserName(), user);
+			System.out.println("added user "+user.getUserId());
 		}
 	}
 	
@@ -130,19 +134,17 @@ public class TourGuideService {
 //		StopWatch stopWatch = new StopWatch();
 //		stopWatch.start();
 		VisitedLocation visitedLocation = null;
-		es.execute(new Runnable(){
-			@Override
-			public void run() {
-//				rewardsService.reNewThreadPool();
-//				visitedLocation = trackUserLocationWithoutThread(user);
-				trackUserLocationWithoutThread(user);
+//		es.execute(new Runnable(){
+//			@Override
+//			public void run() {
+//				trackUserLocationWithoutThread(user);
 //				try {
 //					rewardsService.waitThreadToFinish(1);
 //				} catch (InterruptedException e) {
 //					logger.error("error",e);
 //				}
-			}
-		});
+//			}
+//		});
 
 //		CompletableFuture<VisitedLocation> completableFuture = new CompletableFuture<>();
 //		Executors.newCachedThreadPool()
@@ -159,6 +161,23 @@ public class TourGuideService {
 //		} catch (ExecutionException e) {
 //			e.printStackTrace();
 //		}
+
+		Callable<VisitedLocation> callable = new Callable<VisitedLocation>() {
+			@Override
+			public VisitedLocation call() throws Exception {
+				return trackUserLocationWithoutThread(user);
+			}
+		};
+
+		Future<VisitedLocation> future = es.submit(callable);
+		try{
+//			waitThreadToFinish(2);
+			visitedLocation = future.get();
+		}catch(InterruptedException e){
+			System.out.println("problem wait thread");
+		}catch(ExecutionException ee){
+			System.out.println("problem future get");
+		}
 
 //		stopWatch.stop();
 //		logger.debug("Tracker Time Elapsed: " + stopWatch.getTime() + " ms.");
@@ -214,7 +233,7 @@ public class TourGuideService {
 	 **********************************************************************************/
 	private static final String tripPricerApiKey = "test-server-api-key";
 	// Database connection will be used for external users, but for testing purposes internal users are provided and stored in memory
-	private final Map<String, User> internalUserMap = new HashMap<>();
+	private Map<String, User> internalUserMap = new HashMap<>();
 	private void initializeInternalUsers() {
 		IntStream.range(0, InternalTestHelper.getInternalUserNumber()).forEach(i -> {
 			String userName = "internalUser" + i;
@@ -226,6 +245,10 @@ public class TourGuideService {
 			internalUserMap.put(userName, user);
 		});
 		logger.debug("Created " + InternalTestHelper.getInternalUserNumber() + " internal test users.");
+	}
+
+	private void clearInternalUser(){
+		internalUserMap = new HashMap<>();
 	}
 	
 	private void generateUserLocationHistory(User user) {

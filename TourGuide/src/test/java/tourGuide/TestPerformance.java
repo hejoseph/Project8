@@ -62,6 +62,9 @@ public class TestPerformance {
 //	@Ignore
 	@Test
 	public void highVolumeTrackLocation() throws InterruptedException {
+		InternalTestHelper.setInternalUserNumber(100000);
+		tourGuideService.initializeUserAndTracker();
+
 		List<User> allUsers = new ArrayList<>();
 		allUsers = tourGuideService.getAllUsers();
 		
@@ -90,9 +93,10 @@ public class TestPerformance {
 
 	@Test
 	public void highVolumeGetRewards() throws ExecutionException, InterruptedException {
-		int stopTestAfterSeconds = 180;
 		// Users should be incremented up to 100,000, and test finishes within 20 minutes
-//		InternalTestHelper.setInternalUserNumber(100000);
+		InternalTestHelper.setInternalUserNumber(100000);
+		tourGuideService.initializeUserAndTracker();
+
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 
