@@ -19,6 +19,8 @@ public class User {
 	private UserPreferences userPreferences = new UserPreferences();
 	private List<Provider> tripDeals = new ArrayList<>();
 
+	private String debug;
+
 	private boolean rewardCalled;
 
 	public User(UUID userId, String userName, String phoneNumber, String emailAddress) {
@@ -27,8 +29,17 @@ public class User {
 		this.phoneNumber = phoneNumber;
 		this.emailAddress = emailAddress;
 		this.rewardCalled = false;
+		this.debug = "";
 	}
-	
+
+	public synchronized void addDebug(String value){
+		this.debug += value;
+	}
+
+	public String getDebug(){
+		return this.debug;
+	}
+
 	public UUID getUserId() {
 		return userId;
 	}

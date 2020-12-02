@@ -23,7 +23,6 @@ import tourGuide.tracker.Tracker;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
 
-@Service
 public class TourGuideService {
 	private Logger logger = LoggerFactory.getLogger(TourGuideService.class);
 //	private final GpsUtilCustom gpsUtilCustom;
@@ -32,21 +31,20 @@ public class TourGuideService {
 	public Tracker tracker;
 	boolean testMode = true;
 
-	@Autowired
 	public GpsUtilService gpsUtilService;
 
-	@Autowired
 	public RewardsService rewardsService;
 
 //	ExecutorService es = Executors.newCachedThreadPool();
-	ExecutorService es;
+	ExecutorService es = Executors.newFixedThreadPool(1000);
 
 	public RestTemplate restTemplate;
 	public String serviceUrl;
 
-	public TourGuideService(/*GpsUtilCustom gpsUtilCustom, RewardsService rewardsService*/) {
+	public TourGuideService(GpsUtilService gpsUtilService, RewardsService rewardsService) {
 //		this.gpsUtilCustom = gpsUtilCustom;
-//		this.rewardsService = rewardsService;
+		this.gpsUtilService = gpsUtilService;
+		this.rewardsService = rewardsService;
 
 		this.restTemplate = new RestTemplate();
 		this.serviceUrl = "http://localhost:9093";
@@ -65,7 +63,7 @@ public class TourGuideService {
 		}
 		tracker = new Tracker(this);
 		addShutDownHook();
-		es = Executors.newFixedThreadPool(1000);
+//		es = Executors.newFixedThreadPool(1000);
 	}
 	
 	public List<UserReward> getUserRewards(User user) {
@@ -134,17 +132,17 @@ public class TourGuideService {
 //		StopWatch stopWatch = new StopWatch();
 //		stopWatch.start();
 		VisitedLocation visitedLocation = null;
-//		es.execute(new Runnable(){
-//			@Override
-//			public void run() {
-//				trackUserLocationWithoutThread(user);
+		es.execute(new Runnable(){
+			@Override
+			public void run() {
+				trackUserLocationWithoutThread(user);
 //				try {
 //					rewardsService.waitThreadToFinish(1);
 //				} catch (InterruptedException e) {
 //					logger.error("error",e);
 //				}
-//			}
-//		});
+			}
+		});
 
 //		CompletableFuture<VisitedLocation> completableFuture = new CompletableFuture<>();
 //		Executors.newCachedThreadPool()
@@ -162,22 +160,21 @@ public class TourGuideService {
 //			e.printStackTrace();
 //		}
 
-		Callable<VisitedLocation> callable = new Callable<VisitedLocation>() {
-			@Override
-			public VisitedLocation call() throws Exception {
-				return trackUserLocationWithoutThread(user);
-			}
-		};
+//		Callable<VisitedLocation> callable = new Callable<VisitedLocation>() {
+//			@Override
+//			public VisitedLocation call() throws Exception {
+//				return trackUserLocationWithoutThread(user);
+//			}
+//		};
 
-		Future<VisitedLocation> future = es.submit(callable);
-		try{
-//			waitThreadToFinish(2);
-			visitedLocation = future.get();
-		}catch(InterruptedException e){
-			System.out.println("problem wait thread");
-		}catch(ExecutionException ee){
-			System.out.println("problem future get");
-		}
+//		Future<VisitedLocation> future = es.submit(callable);
+//		try{
+//			visitedLocation = future.get();
+//		}catch(InterruptedException e){
+//			System.out.println("problem wait thread");
+//		}catch(ExecutionException ee){
+//			System.out.println("problem future get");
+//		}
 
 //		stopWatch.stop();
 //		logger.debug("Tracker Time Elapsed: " + stopWatch.getTime() + " ms.");

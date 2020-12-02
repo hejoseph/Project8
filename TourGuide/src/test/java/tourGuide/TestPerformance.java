@@ -10,6 +10,9 @@ import java.util.UUID;
 import java.util.concurrent.*;
 
 import org.apache.commons.lang3.time.StopWatch;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -26,17 +29,12 @@ import tourGuide.service.TourGuideService;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
 public class TestPerformance {
 
-	@Autowired
 	public GpsUtilService gpsUtilService;
 
-	@Autowired
 	public RewardsService rewardsService;
 
-	@Autowired
 	public TourGuideService tourGuideService;
 
 	/*
@@ -58,7 +56,16 @@ public class TestPerformance {
      *     highVolumeGetRewards: 100,000 users within 20 minutes:
 	 *          assertTrue(TimeUnit.MINUTES.toSeconds(20) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
 	 */
-	
+
+
+	@Before
+	public void init(){
+		this.gpsUtilService = new GpsUtilService();
+		this.rewardsService = new RewardsService(new GpsUtilService());
+		this.tourGuideService = new TourGuideService(new GpsUtilService(), new RewardsService(new GpsUtilService()));
+	}
+
+
 //	@Ignore
 	@Test
 	public void highVolumeTrackLocation() throws InterruptedException {
@@ -105,18 +112,23 @@ public class TestPerformance {
 		allUsers = tourGuideService.getAllUsers();
 		allUsers.forEach(u -> u.addToVisitedLocations(new VisitedLocation(u.getUserId(), attraction, new Date())));
 
-	    allUsers.forEach(u -> rewardsService.calculateRewards(u));
+//	    allUsers.forEach(u -> rewardsService.calculateRewards(u));
+		for(User user : allUsers){
+			user.addDebug("main");
+			rewardsService.calculateRewards(user);
+		}
 		boolean finished = rewardsService.waitThreadToFinish(20);
 
 	    for(User user : allUsers) {
 //			assertTrue(user.getUserRewards().size() > 0);
 			assertTrue(user.isRewardCalled());
+			System.out.println(user.isRewardCalled()+" "+user.getDebug());
 		}
 		stopWatch.stop();
 		tourGuideService.tracker.stopTracking();
 
 		System.out.println("highVolumeGetRewards: Time Elapsed: " + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()) + " seconds."); 
 		assertTrue(TimeUnit.MINUTES.toSeconds(20) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
+		System.out.println(rewardsService.called);
 	}
-
 }

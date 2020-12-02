@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 
 import org.springframework.web.client.RestTemplate;
@@ -13,11 +14,9 @@ import tourGuide.model.VisitedLocation;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
 
-@Service
 public class RewardsService {
     private static final double STATUTE_MILES_PER_NAUTICAL_MILE = 1.15077945;
 
-    @Autowired
 	public GpsUtilService gpsUtilService;
 
 	// proximity in miles
@@ -32,11 +31,12 @@ public class RewardsService {
 
 
 //	ExecutorService es = Executors.newCachedThreadPool();
-	ExecutorService es = Executors.newFixedThreadPool(5000);
+	ExecutorService es = Executors.newFixedThreadPool(1000);
+//	ExecutorService es = new ThreadPoolExecutor(1000, 1000, 0L, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(200000));
 
-	public RewardsService(/*GpsUtilCustom gpsUtilCustom, RewardCentral rewardCentral*/) {
-//		this.gpsUtilCustom = gpsUtilCustom;
-//		this.rewardsCentral = rewardCentral;
+
+	public RewardsService(GpsUtilService gpsUtilService) {
+		this.gpsUtilService = gpsUtilService;
 		this.restTemplate = new RestTemplate();
 		this.serviceUrl = "http://localhost:9094";
 		this.serviceUrl = serviceUrl.startsWith("http") ?
@@ -81,11 +81,20 @@ public class RewardsService {
 		es = Executors.newCachedThreadPool();
 	}
 
+	public int called = 0;
+
+	public synchronized void increment(){
+		this.called = this.called+1;
+	}
+
 	public void calculateRewards(User user) {
-//		StopWatch stopWatch = new StopWatch();
+		increment();
+		//		StopWatch stopWatch = new StopWatch();
 //		stopWatch.start();
 
 //		Thread thread = new Thread(()->{
+
+//		user.addDebug(user.getPhoneNumber());
 
 		es.execute(new Runnable(){
 			@Override

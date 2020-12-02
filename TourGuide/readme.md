@@ -23,7 +23,7 @@ Get Rewards :
 Users	Time (Seconds)	Improved Time   Improved Time (pool Thread)
 100	    44	            2               2
 1000	472	            4               2
-10000	5820	        22 -> 28              11
+10000	5820	        22 -> 28 -> 53              11
 100000	64020	        496 -> 252             111
 
 

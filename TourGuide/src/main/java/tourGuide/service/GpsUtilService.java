@@ -1,6 +1,7 @@
 package tourGuide.service;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import tourGuide.model.Attraction;
@@ -11,7 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-@Service
 public class GpsUtilService {
     public RestTemplate restTemplate;
     public String serviceUrl;
