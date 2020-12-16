@@ -16,7 +16,7 @@ Users	Time (Seconds)	Improved Time   Improved Time (26 attractions)
 5000	376	            8               24
 10000	762	            19              34
 50000	3791	        351             387
-100000	7579	        875                            
+100000	7579	        875 -> 430                            
 
 
 Get Rewards : 
@@ -24,7 +24,7 @@ Users	Time (Seconds)	Improved Time   Improved Time (pool Thread)
 100	    44	            2               2
 1000	472	            4               2
 10000	5820	        22 -> 28 -> 53              11
-100000	64020	        496 -> 252             111
+100000	64020	        496 -> 252 -> 519 -> 260             111
 
 
 improved code with thread pool, wait all threads to finish before doing test

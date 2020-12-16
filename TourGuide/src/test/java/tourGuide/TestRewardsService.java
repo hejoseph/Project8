@@ -13,6 +13,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.model.Attraction;
@@ -22,8 +24,11 @@ import tourGuide.service.RewardsService;
 import tourGuide.service.TourGuideService;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
+import tourGuide.util.HttpClientConfig;
+import tourGuide.util.RestTemplateConfig;
 
-@RunWith(SpringRunner.class)
+@ContextConfiguration(classes = { RestTemplateConfig.class, HttpClientConfig.class })
+@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 public class TestRewardsService {
 

@@ -19,6 +19,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.model.Attraction;
@@ -28,13 +30,21 @@ import tourGuide.service.RewardsService;
 import tourGuide.service.TourGuideService;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
+import tourGuide.util.HttpClientConfig;
+import tourGuide.util.RestTemplateConfig;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest
+@ContextConfiguration(classes = { RestTemplateConfig.class, HttpClientConfig.class })
 public class TestPerformance {
 
+//	@Autowired
 	public GpsUtilService gpsUtilService;
 
+//	@Autowired
 	public RewardsService rewardsService;
 
+//	@Autowired
 	public TourGuideService tourGuideService;
 
 	/*
@@ -58,11 +68,18 @@ public class TestPerformance {
 	 */
 
 
+//	@Before
+//	public void init(){
+//		this.gpsUtilService = new GpsUtilService();
+//		this.rewardsService = new RewardsService(new GpsUtilService());
+//		this.tourGuideService = new TourGuideService(new GpsUtilService(), new RewardsService(new GpsUtilService()));
+//	}
+
 	@Before
 	public void init(){
 		this.gpsUtilService = new GpsUtilService();
-		this.rewardsService = new RewardsService(new GpsUtilService());
-		this.tourGuideService = new TourGuideService(new GpsUtilService(), new RewardsService(new GpsUtilService()));
+		this.rewardsService = new RewardsService(this.gpsUtilService);
+		this.tourGuideService = new TourGuideService(this.gpsUtilService, this.rewardsService);
 	}
 
 
@@ -82,20 +99,31 @@ public class TestPerformance {
 		for(User user : allUsers) {
 			tourGuideService.trackUserLocation(user);
 		}
-		tourGuideService.waitThreadToFinish(10);
-		rewardsService.waitThreadToFinish(10);
 
-		stopWatch.stop();
-		tourGuideService.tracker.stopTracking();
+		for(int i = 0; i < allUsers.size(); i++) {
+			User user = allUsers.get(i);
+			user.addDebug("main");
+			tourGuideService.trackUserLocation(user);
+		}
 
+		tourGuideService.waitThreadToFinish(20);
+		rewardsService.waitThreadToFinish(20);
+
+		int nb = 0;
 		for(User user : allUsers) {
 //			System.out.println(user.getUserRewards().size());
 //			assertTrue(user.getUserRewards().size() > 0);
 			assertTrue(user.isRewardCalled());
+			if(user.isRewardCalled()) nb = nb+1;
+//			System.out.println(user.isRewardCalled()+" "+user.getDebug());
 		}
+
+		stopWatch.stop();
+		tourGuideService.tracker.stopTracking();
 
 		System.out.println("highVolumeTrackLocation: Time Elapsed: " + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()) + " seconds."); 
 		assertTrue(TimeUnit.MINUTES.toSeconds(15) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
+		System.out.println(nb);
 	}
 
 	@Test
@@ -113,22 +141,29 @@ public class TestPerformance {
 		allUsers.forEach(u -> u.addToVisitedLocations(new VisitedLocation(u.getUserId(), attraction, new Date())));
 
 //	    allUsers.forEach(u -> rewardsService.calculateRewards(u));
-		for(User user : allUsers){
+//		for(User user : allUsers){
+		for(int i = 0; i < allUsers.size(); i++){
+			User user = allUsers.get(i);
 			user.addDebug("main");
 			rewardsService.calculateRewards(user);
+//			if(i%1000==0)Thread.sleep(1000);
 		}
-		boolean finished = rewardsService.waitThreadToFinish(20);
+		rewardsService.waitThreadToFinish(10);
 
+//		Thread.sleep(10000);
+
+		int nb = 0;
 	    for(User user : allUsers) {
 //			assertTrue(user.getUserRewards().size() > 0);
 			assertTrue(user.isRewardCalled());
-			System.out.println(user.isRewardCalled()+" "+user.getDebug());
+			if(user.isRewardCalled()) nb = nb+1;
+//			System.out.println(user.isRewardCalled()+" "+user.getDebug());
 		}
 		stopWatch.stop();
 		tourGuideService.tracker.stopTracking();
 
 		System.out.println("highVolumeGetRewards: Time Elapsed: " + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()) + " seconds."); 
 		assertTrue(TimeUnit.MINUTES.toSeconds(20) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
-		System.out.println(rewardsService.called);
+		System.out.println(nb);
 	}
 }

@@ -22,15 +22,21 @@ import tourGuide.user.User;
 @RestController
 public class TourGuideController {
 
-	@Autowired
+//	@Autowired
 	TourGuideService tourGuideService;
 
-	@Autowired
+//	@Autowired
     GpsUtilService gpsUtilService;
 
-	@Autowired
+//	@Autowired
     RewardsService rewardsService;
-	
+
+    public TourGuideController(){
+        this.gpsUtilService = new GpsUtilService();
+        this.rewardsService = new RewardsService(this.gpsUtilService);
+        this.tourGuideService = new TourGuideService(this.gpsUtilService, this.rewardsService);
+    }
+
     @RequestMapping("/")
     public String index() {
         return "Greetings from TourGuide!";
@@ -94,13 +100,13 @@ public class TourGuideController {
     	return JsonStream.serialize(providers);
     }
 
-    @RequestMapping("test")
+    @RequestMapping("/test")
     public String test(){
 
-        List<Attraction> attractions = gpsUtilService.getAttractions();
+//        List<Attraction> attractions = gpsUtilService.getAttractions();
 //        return JsonStream.serialize(attractions);
 
-//        VisitedLocation visit = gpsUtilService.getUserLocation(UUID.randomUUID());
+        VisitedLocation visit = gpsUtilService.getUserLocation(UUID.randomUUID());
 
 //        int point = rewardsService.getRewardPoints(UUID.randomUUID(),UUID.randomUUID());
 
