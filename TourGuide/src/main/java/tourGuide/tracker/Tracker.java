@@ -50,7 +50,7 @@ public class Tracker extends Thread {
 			for(User user : users){
 //				user.setPhoneNumber("tracker");
 				user.addDebug("tracker");
-				tourGuideService.trackUserLocation(user);
+				tourGuideService.trackUserLocationWithExecutorService(user);
 			}
 
 			stopWatch.stop();

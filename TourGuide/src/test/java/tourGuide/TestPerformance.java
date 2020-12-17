@@ -6,22 +6,16 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.*;
 
 import org.apache.commons.lang3.time.StopWatch;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.Logger;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.junit4.SpringRunner;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.model.Attraction;
 import tourGuide.model.VisitedLocation;
@@ -29,7 +23,6 @@ import tourGuide.service.GpsUtilService;
 import tourGuide.service.RewardsService;
 import tourGuide.service.TourGuideService;
 import tourGuide.user.User;
-import tourGuide.user.UserReward;
 import tourGuide.util.HttpClientConfig;
 import tourGuide.util.RestTemplateConfig;
 
@@ -97,13 +90,13 @@ public class TestPerformance {
 
 //		rewardsService.setProximityBuffer(Integer.MAX_VALUE);
 		for(User user : allUsers) {
-			tourGuideService.trackUserLocation(user);
+			tourGuideService.trackUserLocationWithExecutorService(user);
 		}
 
 		for(int i = 0; i < allUsers.size(); i++) {
 			User user = allUsers.get(i);
 			user.addDebug("main");
-			tourGuideService.trackUserLocation(user);
+			tourGuideService.trackUserLocationWithExecutorService(user);
 		}
 
 		tourGuideService.waitThreadToFinish(20);
@@ -145,7 +138,7 @@ public class TestPerformance {
 		for(int i = 0; i < allUsers.size(); i++){
 			User user = allUsers.get(i);
 			user.addDebug("main");
-			rewardsService.calculateRewards(user);
+			rewardsService.calculateRewardsWithExecutorService(user);
 //			if(i%1000==0)Thread.sleep(1000);
 		}
 		rewardsService.waitThreadToFinish(10);

@@ -9,9 +9,7 @@ import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 
 import org.springframework.web.client.RestTemplate;
 import tourGuide.helper.InternalTestHelper;
@@ -73,7 +71,7 @@ public class TourGuideService {
 	public VisitedLocation getUserLocation(User user) {
 		VisitedLocation visitedLocation = (user.getVisitedLocations().size() > 0) ?
 			user.getLastVisitedLocation() :
-			trackUserLocation(user);
+			trackUserLocationWithoutRewardExecutorService(user);
 		return visitedLocation;
 	}
 	
@@ -110,13 +108,24 @@ public class TourGuideService {
 		user.setTripDeals(providers);
 		return providers;
 	}
-	
-	public VisitedLocation trackUserLocationWithoutThread(User user) {
+
+	public VisitedLocation trackUserLocationWithoutRewardExecutorService(User user) {
 //		StopWatch stopWatch = new StopWatch();
 //		stopWatch.start();
 		VisitedLocation visitedLocation = gpsUtilService.getUserLocation(user.getUserId());
 		user.addToVisitedLocations(visitedLocation);
-		rewardsService.calculateRewards(user);
+		rewardsService.calculateRewardsWithoutThread(user);
+//		stopWatch.stop();
+//		logger.debug("Tracker Time Elapsed: " + stopWatch.getTime() + " ms.");
+		return visitedLocation;
+	}
+	
+	public VisitedLocation trackUserLocationWithRewardExecutorService(User user) {
+//		StopWatch stopWatch = new StopWatch();
+//		stopWatch.start();
+		VisitedLocation visitedLocation = gpsUtilService.getUserLocation(user.getUserId());
+		user.addToVisitedLocations(visitedLocation);
+		rewardsService.calculateRewardsWithExecutorService(user);
 //		stopWatch.stop();
 //		logger.debug("Tracker Time Elapsed: " + stopWatch.getTime() + " ms.");
 		return visitedLocation;
@@ -128,14 +137,13 @@ public class TourGuideService {
 	}
 
 
-	public VisitedLocation trackUserLocation(User user) {
+	public void trackUserLocationWithExecutorService(User user) {
 //		StopWatch stopWatch = new StopWatch();
 //		stopWatch.start();
-		VisitedLocation visitedLocation = null;
 		es.execute(new Runnable(){
 			@Override
 			public void run() {
-				trackUserLocationWithoutThread(user);
+				trackUserLocationWithRewardExecutorService(user);
 //				try {
 //					rewardsService.waitThreadToFinish(1);
 //				} catch (InterruptedException e) {
@@ -178,7 +186,7 @@ public class TourGuideService {
 
 //		stopWatch.stop();
 //		logger.debug("Tracker Time Elapsed: " + stopWatch.getTime() + " ms.");
-		return visitedLocation;
+//		return visitedLocation;
 //		return null;
 	}
 

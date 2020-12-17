@@ -57,7 +57,7 @@ public class RewardsService {
 		proximityBuffer = defaultProximityBuffer;
 	}
 
-	private void calculateRewardsWithoutThread(User user){
+	public void calculateRewardsWithoutThread(User user){
 //		StopWatch stopWatch = new StopWatch();
 //		stopWatch.start();
 
@@ -95,7 +95,7 @@ public class RewardsService {
 		this.called = this.called+1;
 	}
 
-	public void calculateRewards(User user) {
+	public void calculateRewardsWithExecutorService(User user) {
 		//		StopWatch stopWatch = new StopWatch();
 //		stopWatch.start();
 
