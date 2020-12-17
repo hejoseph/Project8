@@ -4,21 +4,25 @@ import java.util.List;
 import java.util.concurrent.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 import tourGuide.model.Attraction;
 import tourGuide.model.Location;
 import tourGuide.model.VisitedLocation;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
 
-@Service
 public class RewardsService {
     private static final double STATUTE_MILES_PER_NAUTICAL_MILE = 1.15077945;
 
-    @Autowired
 	public GpsUtilService gpsUtilService;
+
+	private final WebClient webClient;
 
 	// proximity in miles
     private int defaultProximityBuffer = 10;
@@ -32,15 +36,17 @@ public class RewardsService {
 
 
 //	ExecutorService es = Executors.newCachedThreadPool();
-	ExecutorService es = Executors.newFixedThreadPool(5000);
+	ExecutorService es = Executors.newFixedThreadPool(500);
+//	ExecutorService es = new ThreadPoolExecutor(1000, 1000, 0L, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(200000));
 
-	public RewardsService(/*GpsUtilCustom gpsUtilCustom, RewardCentral rewardCentral*/) {
-//		this.gpsUtilCustom = gpsUtilCustom;
-//		this.rewardsCentral = rewardCentral;
+
+	public RewardsService(GpsUtilService gpsUtilService) {
+		this.gpsUtilService = gpsUtilService;
 		this.restTemplate = new RestTemplate();
 		this.serviceUrl = "http://localhost:9094";
 		this.serviceUrl = serviceUrl.startsWith("http") ?
 				serviceUrl : "http://" + serviceUrl;
+		this.webClient = WebClient.create(this.serviceUrl);
 	}
 	
 	public void setProximityBuffer(int proximityBuffer) {
@@ -51,7 +57,7 @@ public class RewardsService {
 		proximityBuffer = defaultProximityBuffer;
 	}
 
-	private void calculateRewardsWithoutThread(User user){
+	public void calculateRewardsWithoutThread(User user){
 //		StopWatch stopWatch = new StopWatch();
 //		stopWatch.start();
 
@@ -72,8 +78,10 @@ public class RewardsService {
 
 //		stopWatch.stop();
 //		System.out.println("Time Elapsed: " + stopWatch.getTime() + " ms.");
-
 		user.setRewardCalled(true);
+//		if(attractions.size()==0){
+//			user.setRewardCalled(false);
+//		}
 	}
 
 
@@ -81,11 +89,19 @@ public class RewardsService {
 		es = Executors.newCachedThreadPool();
 	}
 
-	public void calculateRewards(User user) {
-//		StopWatch stopWatch = new StopWatch();
+	public int called = 0;
+
+	public synchronized void increment(){
+		this.called = this.called+1;
+	}
+
+	public void calculateRewardsWithExecutorService(User user) {
+		//		StopWatch stopWatch = new StopWatch();
 //		stopWatch.start();
 
 //		Thread thread = new Thread(()->{
+
+//		user.addDebug(user.getPhoneNumber());
 
 		es.execute(new Runnable(){
 			@Override
@@ -110,11 +126,16 @@ public class RewardsService {
 	}
 	
 	public int getRewardPoints(Attraction attraction, User user) {
-		Integer point = restTemplate.getForObject(serviceUrl
-				+ "/getAttractionRewardPoints?attractionId={attractionId}&userId={userId}", Integer.class, attraction.attractionId, user.getUserId());
+//		Integer point = restTemplate.getForObject(serviceUrl
+//				+ "/getAttractionRewardPoints?attractionId={attractionId}&userId={userId}", Integer.class, attraction.attractionId, user.getUserId());
 
-		return point;
+		Mono<Integer> stream = this.webClient
+				.get()
+				.uri("/getAttractionRewardPoints?attractionId={attractionId}&userId={userId}", attraction.attractionId, user.getUserId())
+				.retrieve().bodyToMono(new ParameterizedTypeReference<Integer>(){});
 
+//		return point;
+		return stream.block();
 //		return rewardsCentral.getAttractionRewardPoints(attraction.attractionId, user.getUserId());
 	}
 	
