@@ -2,6 +2,7 @@ package tourGuide.service;
 
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -62,8 +63,11 @@ public class RewardsService {
 //		stopWatch.start();
 
 
-		List<VisitedLocation> userLocations = user.getVisitedLocations();
-		List<Attraction> attractions = gpsUtilService.getAttractions();
+		List<VisitedLocation> userLocations = user.getVisitedLocations().stream().collect(Collectors.toList());
+		List<Attraction> attractions = gpsUtilService.getAttractions().stream().collect(Collectors.toList());
+
+//		List<VisitedLocation> userLocations = user.getVisitedLocations();
+//		List<Attraction> attractions = gpsUtilService.getAttractions();
 
 		for(int i = 0; i<userLocations.size();i++){
 			VisitedLocation visitedLocation = userLocations.get(i);

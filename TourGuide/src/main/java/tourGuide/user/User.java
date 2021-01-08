@@ -92,7 +92,7 @@ public class User {
 		visitedLocations.clear();
 	}
 
-	public synchronized boolean hasRewardForAttraction(String attractionName){
+	public boolean hasRewardForAttraction(String attractionName){
 		boolean hasReward = false;
 
 		for(int i=0; i<this.getUserRewards().size();i++){

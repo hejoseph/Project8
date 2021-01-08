@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jsoniter.output.JsonStream;
 
+import tourGuide.helper.InternalTestHelper;
 import tourGuide.model.Attraction;
 import tourGuide.model.Provider;
 import tourGuide.model.VisitedLocation;
@@ -51,6 +52,13 @@ public class TourGuideController {
     public String getLocation(@RequestParam String userName) {
     	VisitedLocation visitedLocation = tourGuideService.getUserLocation(getUser(userName));
 		return JsonStream.serialize(visitedLocation.location);
+    }
+
+    @RequestMapping("/initUser")
+    public void initUser(@RequestParam String number) {
+        InternalTestHelper.setInternalUserNumber(Integer.parseInt(number));
+        tourGuideService.initializeUserAndTracker();
+
     }
     
     //  TODO: Change this method to no longer return a List of Attractions.

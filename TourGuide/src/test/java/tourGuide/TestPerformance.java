@@ -10,6 +10,7 @@ import java.util.concurrent.*;
 
 import org.apache.commons.lang3.time.StopWatch;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
@@ -119,6 +120,7 @@ public class TestPerformance {
 		System.out.println(nb);
 	}
 
+//	@Ignore
 	@Test
 	public void highVolumeGetRewards() throws ExecutionException, InterruptedException {
 		// Users should be incremented up to 100,000, and test finishes within 20 minutes
