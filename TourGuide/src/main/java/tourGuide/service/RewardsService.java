@@ -1,14 +1,6 @@
 package tourGuide.service;
 
-import java.util.List;
-import java.util.concurrent.*;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.stereotype.Service;
-
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -17,6 +9,12 @@ import tourGuide.model.Location;
 import tourGuide.model.VisitedLocation;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
+
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class RewardsService {
     private static final double STATUTE_MILES_PER_NAUTICAL_MILE = 1.15077945;
@@ -83,9 +81,6 @@ public class RewardsService {
 //		stopWatch.stop();
 //		System.out.println("Time Elapsed: " + stopWatch.getTime() + " ms.");
 		user.setRewardCalled(true);
-//		if(attractions.size()==0){
-//			user.setRewardCalled(false);
-//		}
 	}
 
 

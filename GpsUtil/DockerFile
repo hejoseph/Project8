@@ -1,3 +1,4 @@
 From openjdk:8
+EXPOSE 8080
 ADD ./target/Project8-gpsutil-0.0.1-SNAPSHOT.jar Project8-gpsutil-0.0.1-SNAPSHOT.jar
 ENTRYPOINT ["java","-jar","Project8-gpsutil-0.0.1-SNAPSHOT.jar"]

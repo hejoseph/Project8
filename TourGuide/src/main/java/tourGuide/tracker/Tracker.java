@@ -1,16 +1,15 @@
 package tourGuide.tracker;
 
+import org.apache.commons.lang3.time.StopWatch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import tourGuide.service.TourGuideService;
+import tourGuide.user.User;
+
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.lang3.time.StopWatch;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import tourGuide.service.TourGuideService;
-import tourGuide.user.User;
 
 public class Tracker extends Thread {
 	private Logger logger = LoggerFactory.getLogger(Tracker.class);
@@ -48,7 +47,6 @@ public class Tracker extends Thread {
 //			users.forEach(u -> tourGuideService.trackUserLocation(u));
 
 			for(User user : users){
-//				user.setPhoneNumber("tracker");
 				user.addDebug("tracker");
 				tourGuideService.trackUserLocationWithoutRewardExecutorService(user);
 			}

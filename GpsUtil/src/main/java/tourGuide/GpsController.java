@@ -1,16 +1,15 @@
 package tourGuide;
 
-import java.util.List;
-import java.util.UUID;
-
 import gpsUtil.location.Attraction;
+import gpsUtil.location.VisitedLocation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import gpsUtil.location.VisitedLocation;
 import tourGuide.module.GpsUtilCustom;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 public class GpsController {
@@ -23,7 +22,7 @@ public class GpsController {
 
     @RequestMapping("/")
     public String index() {
-        return "Greetings from TourGuide!";
+        return "Greetings from TourGuide! GpsUtil";
     }
 
 //    @RequestMapping("/getVisitedLocation")

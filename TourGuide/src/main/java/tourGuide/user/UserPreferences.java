@@ -1,9 +1,9 @@
 package tourGuide.user;
 
+import org.javamoney.moneta.Money;
+
 import javax.money.CurrencyUnit;
 import javax.money.Monetary;
-
-import org.javamoney.moneta.Money;
 
 
 public class UserPreferences {

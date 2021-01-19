@@ -1,16 +1,7 @@
 package tourGuide;
 
-import static org.junit.Assert.*;
-
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
@@ -25,6 +16,14 @@ import tourGuide.user.User;
 import tourGuide.user.UserReward;
 import tourGuide.util.HttpClientConfig;
 import tourGuide.util.RestTemplateConfig;
+
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @ContextConfiguration(classes = { RestTemplateConfig.class, HttpClientConfig.class })
 @RunWith(SpringJUnit4ClassRunner.class)

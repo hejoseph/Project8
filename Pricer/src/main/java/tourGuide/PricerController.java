@@ -16,6 +16,11 @@ public class PricerController {
     @Autowired
     public PricerService pricerService;
 
+    @RequestMapping("/")
+    public String index() {
+        return "Greetings from TourGuide! Pricer";
+    }
+
     @RequestMapping("/getPrice")
     public List<Provider> getPrice(@RequestParam String apiKey, @RequestParam UUID attractionId, @RequestParam int adults, @RequestParam int children, @RequestParam int nightsStay, @RequestParam int rewardsPoints) {
         List<Provider> providers = pricerService.getPrice(apiKey, attractionId, adults, children, nightsStay, rewardsPoints);

@@ -16,6 +16,11 @@ public class RewardCentralController {
 
     public int times = 0;
 
+    @RequestMapping("/")
+    public String index() {
+        return "Greetings from TourGuide! Reward";
+    }
+
     @RequestMapping("/getAttractionRewardPoints")
     public int getLocation(@RequestParam UUID attractionId, @RequestParam UUID userId) {
 //		times++;
@@ -24,3 +29,5 @@ public class RewardCentralController {
     }
 
 }
+
+

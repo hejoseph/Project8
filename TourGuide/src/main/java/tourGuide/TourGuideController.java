@@ -1,18 +1,10 @@
 package tourGuide;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import com.jsoniter.output.JsonStream;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.jsoniter.output.JsonStream;
-
 import tourGuide.helper.InternalTestHelper;
-import tourGuide.model.Attraction;
 import tourGuide.model.Provider;
 import tourGuide.model.VisitedLocation;
 import tourGuide.service.GpsUtilService;
@@ -20,16 +12,17 @@ import tourGuide.service.RewardsService;
 import tourGuide.service.TourGuideService;
 import tourGuide.user.User;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+
 @RestController
 public class TourGuideController {
 
-//	@Autowired
 	TourGuideService tourGuideService;
 
-//	@Autowired
     GpsUtilService gpsUtilService;
 
-//	@Autowired
     RewardsService rewardsService;
 
     public TourGuideController(){
@@ -108,19 +101,6 @@ public class TourGuideController {
     	return JsonStream.serialize(providers);
     }
 
-    @RequestMapping("/test")
-    public String test(){
-
-//        List<Attraction> attractions = gpsUtilService.getAttractions();
-//        return JsonStream.serialize(attractions);
-
-        VisitedLocation visit = gpsUtilService.getUserLocation(UUID.randomUUID());
-
-//        int point = rewardsService.getRewardPoints(UUID.randomUUID(),UUID.randomUUID());
-
-        return "";
-    }
-    
     private User getUser(String userName) {
     	return tourGuideService.getUser(userName);
     }

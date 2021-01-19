@@ -1,0 +1,22 @@
+version: '3'
+services:
+  GpsUtil:
+    image: gpsutil:latest
+    restart: always
+    ports:
+      - "9092:9092"
+  Pricer:
+    image: pricer:latest
+    restart: always
+    ports:
+      - "9093:9093"
+  Reward:
+    image: reward:latest
+    restart: always
+    ports:
+      - "9094:9094"
+#  TourGuide:
+#    image: tourguide:latest
+#    restart: always
+#    ports:
+#      - "9092:9092"
