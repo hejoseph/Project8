@@ -14,8 +14,8 @@ import tourGuide.service.GpsUtilService;
 import tourGuide.service.RewardsService;
 import tourGuide.service.TourGuideService;
 import tourGuide.user.User;
-import tourGuide.util.HttpClientConfig;
-import tourGuide.util.RestTemplateConfig;
+//import tourGuide.util.HttpClientConfig;
+//import tourGuide.util.RestTemplateConfig;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
-@ContextConfiguration(classes = { RestTemplateConfig.class, HttpClientConfig.class })
+//@ContextConfiguration(classes = { RestTemplateConfig.class, HttpClientConfig.class })
 public class TestPerformance {
 
 //	@Autowired

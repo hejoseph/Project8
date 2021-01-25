@@ -14,8 +14,8 @@ import tourGuide.service.RewardsService;
 import tourGuide.service.TourGuideService;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
-import tourGuide.util.HttpClientConfig;
-import tourGuide.util.RestTemplateConfig;
+//import tourGuide.util.HttpClientConfig;
+//import tourGuide.util.RestTemplateConfig;
 
 import java.util.Date;
 import java.util.List;
@@ -25,7 +25,7 @@ import java.util.concurrent.ExecutionException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@ContextConfiguration(classes = { RestTemplateConfig.class, HttpClientConfig.class })
+//@ContextConfiguration(classes = { RestTemplateConfig.class, HttpClientConfig.class })
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 public class TestRewardsService {
