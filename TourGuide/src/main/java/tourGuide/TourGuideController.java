@@ -14,7 +14,6 @@ import tourGuide.user.User;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 public class TourGuideController {
@@ -43,15 +42,22 @@ public class TourGuideController {
 
     @RequestMapping("/getLocation") 
     public String getLocation(@RequestParam String userName) {
-    	VisitedLocation visitedLocation = tourGuideService.getUserLocation(getUser(userName));
-		return JsonStream.serialize(visitedLocation.location);
+        User user = getUserObject(userName);
+        if(user!=null){
+            VisitedLocation visitedLocation = tourGuideService.getUserLocation(user);
+            return JsonStream.serialize(visitedLocation.location);
+        }else{
+            return "username:"+userName+" does not exist";
+        }
+
+
     }
 
     @RequestMapping("/initUser")
-    public void initUser(@RequestParam String number) {
+    public String initUser(@RequestParam String number) {
         InternalTestHelper.setInternalUserNumber(Integer.parseInt(number));
         tourGuideService.initializeUserAndTracker();
-
+        return "Success : "+number;
     }
     
     //  TODO: Change this method to no longer return a List of Attractions.
@@ -65,13 +71,24 @@ public class TourGuideController {
         //    Note: Attraction reward points can be gathered from RewardsCentral
     @RequestMapping("/getNearbyAttractions") 
     public String getNearbyAttractions(@RequestParam String userName) {
-    	VisitedLocation visitedLocation = tourGuideService.getUserLocation(getUser(userName));
-    	return JsonStream.serialize(tourGuideService.getNearByAttractions(visitedLocation));
+        User user = getUserObject(userName);
+        if(user!=null){
+            VisitedLocation visitedLocation = tourGuideService.getUserLocation(user);
+            return JsonStream.serialize(tourGuideService.getNearByAttractions(visitedLocation));
+        }else{
+            return "username:"+userName+" does not exist";
+        }
+
     }
     
     @RequestMapping("/getRewards") 
     public String getRewards(@RequestParam String userName) {
-    	return JsonStream.serialize(tourGuideService.getUserRewards(getUser(userName)));
+        User user = getUserObject(userName);
+        if(user!=null){
+    	    return JsonStream.serialize(tourGuideService.getUserRewards(user));
+        }else{
+            return "username:"+userName+" does not exist";
+        }
     }
     
     @RequestMapping("/getAllCurrentLocations")
@@ -90,20 +107,36 @@ public class TourGuideController {
         List<User> users = tourGuideService.getAllUsers();
         for(User user : users){
             VisitedLocation lastLocation = user.getLastVisitedLocation();
-            locationHashMap.put(user.getUserId().toString(), lastLocation);
+            locationHashMap.put(user.getUserId()+"", lastLocation);
         }
     	return JsonStream.serialize(locationHashMap);
+    }
+
+    @RequestMapping("/trackUserLocation")
+    public User trackUserLocation(@RequestParam String userName) {
+        User user = getUser(userName);
+        tourGuideService.trackUserLocationWithoutRewardExecutorService(user);
+        return user;
     }
     
     @RequestMapping("/getTripDeals")
     public String getTripDeals(@RequestParam String userName) {
-    	List<Provider> providers = tourGuideService.getTripDeals(getUser(userName));
-    	return JsonStream.serialize(providers);
+        User user = getUserObject(userName);
+        if(user!=null){
+            List<Provider> providers = tourGuideService.getTripDeals(getUserObject(userName));
+            return JsonStream.serialize(providers);
+        }else{
+            return "username:"+userName+" does not exist";
+        }
     }
 
-    private User getUser(String userName) {
+    @RequestMapping("/getUser")
+    public User getUser(@RequestParam String userName) {
+        User user = getUserObject(userName);
+        return user;
+    }
+
+    private User getUserObject(String userName) {
     	return tourGuideService.getUser(userName);
     }
-   
-
 }

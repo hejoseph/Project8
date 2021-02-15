@@ -10,21 +10,21 @@ Synchronized on method "hasRewardForAttraction"
 When not synchronized, 2 threads are adding reward at the same time for the same attraction
 
 Get Location :
-Users	Time (Seconds)	Improved Time   Improved Time (26 attractions)
-100	    7	            0 -> 6              14
-1000	75	            1               16
-5000	376	            8               24
-10000	762	            19              34
-50000	3791	        351             387
-100000	7579	        875 -> 430                            
+Users	Time (Seconds)	Improved Time   
+100	    7	            0          
+1000	75	            1               
+5000	376	            8               
+10000	762	            19              
+50000	3791	        351             
+100000	7579	        430                            
 
 
 Get Rewards : 
-Users	Time (Seconds)	Improved Time   Improved Time (pool Thread)
-100	    44	            2               2
-1000	472	            4               2
-10000	5820	        22 -> 28 -> 53              11
-100000	64020	        496 -> 252 -> 519 -> 260             111
+Users	Time (Seconds)	Improved Time   
+100	    44	            2               
+1000	472	            4               
+10000	5820	        53
+100000	64020	        260
 
 
 improved code with thread pool, wait all threads to finish before doing test
@@ -33,7 +33,9 @@ improved perf for get location
 
 
 
-org.springframework.web.client.ResourceAccessException: I/O error on GET request for "http://localhost:9092/getVisitedLocation": Address already in use: connect; nested exception is java.net.BindException: Address already in use: connect
+org.springframework.web.client.ResourceAccessException: 
+    I/O error on GET request for "http://localhost:9092/getVisitedLocation": Address already in use: connect; 
+    nested exception is java.net.BindException: Address already in use: connect
 at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:748)
 at org.springframework.web.client.RestTemplate.execute(RestTemplate.java:674)
 at org.springframework.web.client.RestTemplate.getForObject(RestTemplate.java:315)
